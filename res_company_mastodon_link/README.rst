@@ -30,8 +30,12 @@ Social Media - Mastodon
 
 This module adds a new "Mastodon URL" field, at company level.
 
+|res_company_form|
+
 Mastodon is a decentralized social network developed in Open Source.
 More information at https://joinmastodon.org/.
+
+.. |res_company_form| image:: https://raw.githubusercontent.com/OCA/social/18.0/res_company_mastodon_link/static/description/res_company_form.png
 
 **Table of contents**
 
