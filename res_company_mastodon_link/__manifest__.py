@@ -12,4 +12,5 @@
     "installable": True,
     "depends": ["social_media"],
     "data": ["views/view_res_company.xml"],
+    "demo": ["demo/demo_res_company.xml"],
 }
