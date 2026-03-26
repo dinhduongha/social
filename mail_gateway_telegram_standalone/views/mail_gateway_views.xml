@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="mail_gateway_view_form_inherit_mail_gateway_telegram_standalone" model="ir.ui.view">
-        <field name="name">mail.gateway.view.form.inherit.mail.gateway.telegram.standalone</field>
+    <record
+        id="mail_gateway_view_form_inherit_mail_gateway_telegram_standalone"
+        model="ir.ui.view"
+    >
+        <field
+            name="name"
+        >mail.gateway.view.form.inherit.mail.gateway.telegram.standalone</field>
         <field name="model">mail.gateway</field>
         <field name="inherit_id" ref="mail_gateway.mail_gateway_form_view" />
         <field name="arch" type="xml">
