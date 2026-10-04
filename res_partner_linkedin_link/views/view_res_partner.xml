@@ -35,7 +35,7 @@
             <field name="is_company" position="after">
                 <field name="social_linkedin" />
             </field>
-            <xpath expr="//footer/div" position="inside">
+            <xpath expr="//footer" position="inside">
                 <t t-if="record.social_linkedin.raw_value">
                     <a
                         t-att-href="record.social_linkedin.value"

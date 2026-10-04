@@ -4,7 +4,7 @@
 {
     "name": "Partner - LinkedIn Link",
     "summary": "Add LinkedIn url at partner model",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "license": "AGPL-3",
     "author": "GRAP, OCA France, Odoo Community Association (OCA)",
     "maintainers": ["legalsylvain"],
