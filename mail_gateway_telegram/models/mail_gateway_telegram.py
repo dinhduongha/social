@@ -12,6 +12,7 @@ from odoo.tools import html2plaintext
 from odoo.tools.mimetypes import guess_mimetype
 
 from odoo.addons.base.models.ir_mail_server import MailDeliveryException
+from odoo.addons.mail.tools.discuss import Store
 
 _logger = logging.getLogger(__name__)
 
@@ -319,14 +320,9 @@ class MailGatewayTelegramService(models.AbstractModel):
                     "gateway_message_id": message.id,
                 }
             )
-        self.env["bus.bus"]._sendone(
-            record.gateway_channel_id,
-            "mail.message/insert",
-            {
-                "id": record.mail_message_id.id,
-                "gateway_type": record.mail_message_id.gateway_type,
-            },
-        )
+        Store(bus_channel=record.gateway_channel_id).add(
+            record.mail_message_id, ["gateway_type"]
+        ).bus_send()
         if auto_commit is True:
             # pylint: disable=invalid-commit
             self.env.cr.commit()

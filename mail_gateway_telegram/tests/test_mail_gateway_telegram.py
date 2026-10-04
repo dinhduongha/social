@@ -775,9 +775,7 @@ class TestMailGatewayTelegram(MailGatewayTestCase):
             [("gateway_id", "=", self.gateway.id)]
         )
         self.assertTrue(channel)
-        store = Store()
-        channel._to_store(store)
-        result = store.get_result()
+        result = Store().add(channel).get_result()
         # Look up the discuss.channel entry that matches our channel's ID
         channel_info_list = result.get("discuss.channel", [])
         channel_info = next(
@@ -813,12 +811,14 @@ class TestMailGatewayTelegram(MailGatewayTestCase):
                 message_type="comment",
             )
         with patch.object(telegram, "Bot", getMyBot()):
-            channel._message_update_content(message, "New message")
+            channel._message_update_content(message, body="New message")
         self.assertRegex(message.body, ".*New message.*")
 
     def _get_partner_store_info(self):
         """Partner data as the web client receives it."""
-        result = Store(self.partner).get_result()
+        result = (
+            Store().add(self.partner, extra_fields=["gateway_channels"]).get_result()
+        )
         return next(
             item
             for item in result.get("res.partner", [])
