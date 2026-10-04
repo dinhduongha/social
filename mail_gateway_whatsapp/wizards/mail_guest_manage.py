@@ -17,6 +17,6 @@ class MailGuestManage(models.TransientModel):
             limit=1,
         )
         if gateway_channel:
-            partner.mobile = gateway_channel.gateway_token
-            partner._onchange_mobile_validation()
+            partner.phone = gateway_channel.gateway_token
+            partner._onchange_phone_validation()
         return True

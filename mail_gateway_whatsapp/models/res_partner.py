@@ -5,16 +5,9 @@ from odoo import models
 
 
 class ResPartner(models.Model):
-    _name = "res.partner"
-    _inherit = ["mail.thread.phone", "res.partner"]
+    # phone_validation already makes res.partner a mail.thread.phone and, since
+    # 19.0, `phone` is the only number field of a partner (no more `mobile`).
+    _inherit = "res.partner"
 
     def _whatsapp_get_partner(self):
         return self
-
-    def _phone_get_number_fields(self):
-        """This method returns the fields to use to find the number to use to
-        send an SMS on a record."""
-        result = set(super()._phone_get_number_fields())
-        result.add("mobile")
-        result.add("phone")
-        return list(result)

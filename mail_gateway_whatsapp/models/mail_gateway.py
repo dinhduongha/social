@@ -1,7 +1,8 @@
 # Copyright 2022 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+from urllib.parse import urljoin
+
 import requests
-from werkzeug.urls import url_join
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -35,7 +36,7 @@ class MailGateway(models.Model):
                 self.env._("WhatsApp Account is required to import templates.")
             )
         meta_info = {}
-        template_url = url_join(
+        template_url = urljoin(
             BASE_URL,
             f"v{self.whatsapp_version}/{self.whatsapp_account_id}/message_templates",
         )

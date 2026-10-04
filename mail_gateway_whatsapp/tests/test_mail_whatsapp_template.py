@@ -173,7 +173,7 @@ class TestMailWhatsAppTemplate(MailGatewayTestCase):
         partner = self.env["res.partner"].create(
             {
                 "name": "Ada Lovelace",
-                "mobile": "+34900111222",
+                "phone": "+34900111222",
             }
         )
         ctx = {
@@ -215,7 +215,7 @@ class TestMailWhatsAppTemplate(MailGatewayTestCase):
                 "name": "{{2}}",
                 "line_type": "body",
                 "template_id": tmpl.id,
-                "field_name": "mobile",
+                "field_name": "phone",
             }
         )
         self.env["mail.whatsapp.template.button"].create(
@@ -237,4 +237,4 @@ class TestMailWhatsAppTemplate(MailGatewayTestCase):
             [p["type"] for p in body.get("parameters", [])], ["text", "text"]
         )
         self.assertEqual(body["parameters"][0]["text"], partner.name)
-        self.assertEqual(body["parameters"][1]["text"], partner.mobile or "")
+        self.assertEqual(body["parameters"][1]["text"], partner.phone or "")

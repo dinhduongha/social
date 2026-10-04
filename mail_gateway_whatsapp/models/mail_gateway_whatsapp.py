@@ -213,13 +213,7 @@ class MailGatewayWhatsappService(models.AbstractModel):
                     )
                     self._post_process_reply(related_message)
                     new_message.gateway_message_id = new_related_message
-                    gateway_thread_data = new_message.sudo().gateway_thread_data
-                    new_message._bus_send_store(
-                        new_message,
-                        {
-                            "gateway_thread_data": gateway_thread_data,
-                        },
-                    )
+                    new_message._gateway_bus_send_thread_data()
 
     def _send(
         self,
