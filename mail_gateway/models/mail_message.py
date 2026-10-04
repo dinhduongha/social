@@ -53,16 +53,18 @@ class MailMessage(models.Model):
                 partners = record.notification_ids.res_partner_id
                 channels = partners.gateway_channel_ids.filtered(
                     lambda r, messages=record.gateway_message_ids: (
-                        r.gateway_token,
-                        r.gateway_id.id,
-                    )
-                    not in [
                         (
-                            notification.gateway_channel_id.gateway_channel_token,
-                            notification.gateway_channel_id.gateway_id.id,
+                            r.gateway_token,
+                            r.gateway_id.id,
                         )
-                        for notification in messages.gateway_notification_ids
-                    ]
+                        not in [
+                            (
+                                notification.gateway_channel_id.gateway_channel_token,
+                                notification.gateway_channel_id.gateway_id.id,
+                            )
+                            for notification in messages.gateway_notification_ids
+                        ]
+                    )
                 )
             else:
                 channels = self.env["res.partner.gateway.channel"]
@@ -80,37 +82,21 @@ class MailMessage(models.Model):
                     0
                 ].gateway_channel_id
 
-    def _to_store(
-        self,
-        store: Store,
-        /,
-        *,
-        fields=None,
-        format_reply=True,
-        msg_vals=None,
-        for_current_user=False,
-        add_followers=False,
-        followers=None,
-    ):
-        result = super()._to_store(
-            store,
-            fields=fields,
-            format_reply=format_reply,
-            msg_vals=msg_vals,
-            for_current_user=for_current_user,
-            add_followers=add_followers,
-            followers=followers,
-        )
-        for record in self:
-            store.add(
-                record,
-                {
-                    "gateway_type": record.gateway_type,
-                    "gateway_channel_data": record.gateway_channel_data,
-                    "gateway_thread_data": record.gateway_thread_data,
-                },
-            )
-        return result
+    def _to_store_defaults(self, target: Store.Target):
+        return super()._to_store_defaults(target) + [
+            "gateway_type",
+            "gateway_channel_data",
+            "gateway_thread_data",
+        ]
+
+    def _gateway_bus_send_thread_data(self):
+        """Push the (possibly updated) linked thread of the messages to the web
+        client."""
+        for message in self:
+            Store(bus_channel=message._bus_channel()).add(
+                message,
+                {"gateway_thread_data": message.sudo().gateway_thread_data},
+            ).bus_send()
 
     def _send_to_gateway_thread(self, gateway_channel_id):
         chat_id = gateway_channel_id.gateway_id._get_channel_id(

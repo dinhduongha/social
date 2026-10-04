@@ -10,9 +10,12 @@
             <label for="partner_ids" position="attributes">
                 <attribute name="invisible">1</attribute>
             </label>
-            <field name="partner_ids" position="attributes">
+            <xpath expr="//div[field[@name='partner_ids']]" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </field>
+            </xpath>
+            <xpath expr="//field[@name='partner_ids'][2]" position="attributes">
+                <attribute name="required">0</attribute>
+            </xpath>
             <field name="subject" position="before">
                 <field name="wizard_partner_ids" invisible="1" />
                 <field
@@ -27,12 +30,10 @@
                 <attribute name="invisible">1</attribute>
                 <attribute name="required">0</attribute>
             </field>
-            <xpath
-                expr="//widget[@name='mail_composer_recipient_list']/.."
-                position="attributes"
-            >
-                <attribute name="invisible">True</attribute>
-            </xpath>
+            <!-- Scheduling is not supported for gateway messages -->
+            <field name="scheduled_date" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
         </field>
     </record>
 </odoo>

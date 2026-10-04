@@ -31,9 +31,4 @@ class MailMessageGatewayLink(models.TransientModel):
             attachment_ids=self.message_id.attachment_ids.ids,
         )
         self.message_id.gateway_message_id = new_message
-        self.message_id._bus_send_store(
-            self.message_id,
-            {
-                "gateway_thread_data": self.message_id.sudo().gateway_thread_data,
-            },
-        )
+        self.message_id._gateway_bus_send_thread_data()

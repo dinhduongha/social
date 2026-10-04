@@ -5,21 +5,14 @@ import {patch} from "@web/core/utils/patch";
 import {user} from "@web/core/user";
 
 patch(Chatter, {
-    components: {...Chatter.components, GatewayFollower},
+  components: {...Chatter.components, GatewayFollower},
 });
 
 patch(Chatter.prototype, {
-    setup() {
-        super.setup(...arguments);
-        this.user = user;
-        onWillStart(async () => {
-            this.hasGatewayGroup = await this.user.hasGroup(
-                "mail_gateway.gateway_user"
-            );
-        });
-    },
-    toggleComposer(mode = false) {
-        this.state.thread.composer.isGateway = mode === "gateway";
-        super.toggleComposer(mode);
-    },
+  setup() {
+    super.setup(...arguments);
+    onWillStart(async () => {
+      this.hasGatewayGroup = await user.hasGroup("mail_gateway.gateway_user");
+    });
+  },
 });

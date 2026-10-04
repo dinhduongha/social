@@ -1,4 +1,3 @@
-from . import ir_websocket
 from . import mail_gateway_abstract
 from . import mail_message
 from . import mail_notification

@@ -61,6 +61,11 @@ class MailComposeGatewayMessage(models.TransientModel):
         string="Bcc",
     )
 
+    def _compute_partner_ids_all_have_email(self):
+        # Gateway recipients are reached through their gateway channel,
+        # an email address is not required.
+        self.partner_ids_all_have_email = True
+
     def _partner_ids_domain(self):
         return [("id", "in", self.env.context.get("default_partner_ids", []))]
 

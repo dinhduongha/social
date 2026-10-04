@@ -55,7 +55,9 @@ class MailThread(models.AbstractModel):
                     "id": partner.id,
                     "is_follower": True,
                     "lang": partner.lang,
-                    "groups": set(user.groups_id.ids),
+                    "name": partner.name,
+                    "email_normalized": partner.email_normalized,
+                    "groups": set(user.group_ids.ids),
                     "notif": notification.get("channel_type"),
                     "share": partner.partner_share,
                     "uid": user[:1].id,
@@ -74,28 +76,30 @@ class MailThread(models.AbstractModel):
             return result
         return super()._notify_get_recipients(message, msg_vals, **kwargs)
 
-    def _thread_to_store(self, store: Store, /, *, fields=None, request_list=None):
-        res = super()._thread_to_store(store, fields=fields, request_list=request_list)
+    def _thread_to_store(self, store: Store, fields, *, request_list=None):
+        super()._thread_to_store(store, fields, request_list=request_list)
+        if not request_list or "followers" not in request_list:
+            return
         for record in self:
-            followers = record.message_get_followers()
-            if "mail.followers" in followers:
-                partners = self.env["res.partner"].browse(
-                    [
-                        follower["partner"]["id"]
-                        for follower in followers["mail.followers"]
-                    ]
-                )
-                # sudo: res.partner.gateway.channel - technical data used to
-                # know which followers can be reached through a gateway
-                gateway_partners = partners.filtered(
-                    lambda partner: partner.sudo().gateway_channel_ids
-                )
-                store.add(
-                    record,
-                    {"gateway_followers": Store.many(gateway_partners)},
-                    as_thread=True,
-                )
-        return res
+            partners = (
+                self.env["mail.followers"]
+                .search([("res_model", "=", record._name), ("res_id", "=", record.id)])
+                .partner_id
+            )
+            # sudo: res.partner.gateway.channel - technical data used to
+            # know which followers can be reached through a gateway
+            gateway_partners = partners.filtered(
+                lambda partner: partner.sudo().gateway_channel_ids
+            )
+            store.add(
+                record,
+                {
+                    "gateway_followers": Store.Many(
+                        gateway_partners, extra_fields=["gateway_channels"]
+                    )
+                },
+                as_thread=True,
+            )
 
     def _check_can_update_message_content(self, messages):
         # We can delete the messages comming from a gateway on not channels
@@ -105,36 +109,14 @@ class MailThread(models.AbstractModel):
             new_messages = messages
         return super()._check_can_update_message_content(new_messages)
 
-    def _message_update_content(
-        self,
-        message,
-        body,
-        attachment_ids=None,
-        partner_ids=None,
-        strict=True,
-        **kwargs,
-    ):
-        result = super()._message_update_content(
-            message=message,
-            body=body,
-            attachment_ids=attachment_ids,
-            partner_ids=partner_ids,
-            strict=strict,
-            **kwargs,
-        )
-        if body == "":
+    def _message_update_content(self, message, /, **kwargs):
+        result = super()._message_update_content(message, **kwargs)
+        if kwargs.get("body") == "":
             # Unlink the message
-            for gateway_msg in message.gateway_message_ids:
-                gateway_msg.gateway_message_id = False
-                gateway_msg._bus_send_store(
-                    gateway_msg,
-                    {
-                        "gateway_thread_data": gateway_msg.sudo().gateway_thread_data,
-                    },
-                )
+            gateway_messages = message.gateway_message_ids
+            gateway_messages.gateway_message_id = False
+            gateway_messages._gateway_bus_send_thread_data()
         return result
 
-    def _get_allowed_message_post_params(self):
-        result = super()._get_allowed_message_post_params()
-        result.add("gateway_notifications")
-        return result
+    def _get_allowed_message_params(self):
+        return super()._get_allowed_message_params() | {"gateway_notifications"}

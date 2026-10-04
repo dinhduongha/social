@@ -16,6 +16,7 @@
                     'btn-secondary': state.composerType !== 'gateway',
                     'my-2': !props.compactHeight
                 }"
+                t-att-disabled="!state.thread.canPostMessage and props.threadId"
                 t-on-click="() => this.toggleComposer('gateway')"
                 data-hotkey="shift+w"
             >
@@ -23,39 +24,29 @@
                 <span> Gateway</span>
             </button>
         </xpath>
-        <xpath
-            expr="//t[@t-if='state.composerType']/SuggestedRecipientsList"
-            position="before"
-        >
+        <xpath expr="//t[@t-if='state.composerType']/Composer" position="before">
             <t
                 t-if="state.composerType === 'gateway' and state.thread.gateway_followers.length"
             >
-                <div
-                    class="flex-shrink-0 px-3 pt-3 text-truncate small mb-2"
-                    style="margin-left:48px"
-                >
-                    <span class="fw-bold">To:</span>
-                    <t
-                        t-foreach="state.thread.gateway_followers"
-                        t-as="gateway_follower"
-                        t-key="gateway_follower.id"
-                    >
-                        <GatewayFollower
-                            follower="gateway_follower"
-                            composer="state.thread.composer"
-                        />
-                    </t>
+                <div class="d-flex py-1 ps-3 small">
+                    <span
+                        class="flex-shrink-0 text-end fw-bold px-2"
+                        style="width:46px"
+                    >To: </span>
+                    <div class="flex-grow-1">
+                        <t
+                            t-foreach="state.thread.gateway_followers"
+                            t-as="gateway_follower"
+                            t-key="gateway_follower.id"
+                        >
+                            <GatewayFollower
+                                follower="gateway_follower"
+                                composer="state.thread.composer"
+                            />
+                        </t>
+                    </div>
                 </div>
             </t>
-            <t t-set="type" t-value="type === 'gateway' ? 'gateway' : type" />
-        </xpath>
-        <xpath
-            expr="//t[@t-if='state.composerType']/SuggestedRecipientsList"
-            position="attributes"
-        >
-            <attribute
-                name="t-if"
-            >state.composerType !== 'note' and state.thread.recipients.length > 0 and state.composerType !== 'gateway'</attribute>
         </xpath>
     </t>
 </templates>
