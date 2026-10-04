@@ -3,7 +3,7 @@
 {
     "name": "Marketing Campaign Budget",
     "summary": "Add budget and actual cost fields to UTM campaigns",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Marketing",
     "author": "Binhex Cloud, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/social",

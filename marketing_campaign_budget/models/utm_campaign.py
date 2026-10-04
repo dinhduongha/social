@@ -15,15 +15,11 @@ class UtmCampaign(models.Model):
         groups="sales_team.group_sale_salesman",
     )
 
-    _sql_constraints = [
-        (
-            "campaign_budget_amount_non_negative",
-            "CHECK(campaign_budget_amount >= 0)",
-            "The budget amount cannot be negative.",
-        ),
-        (
-            "actual_cost_non_negative",
-            "CHECK(actual_cost >= 0)",
-            "The actual cost cannot be negative.",
-        ),
-    ]
+    _campaign_budget_amount_non_negative = models.Constraint(
+        "CHECK(campaign_budget_amount >= 0)",
+        "The budget amount cannot be negative.",
+    )
+    _actual_cost_non_negative = models.Constraint(
+        "CHECK(actual_cost >= 0)",
+        "The actual cost cannot be negative.",
+    )
