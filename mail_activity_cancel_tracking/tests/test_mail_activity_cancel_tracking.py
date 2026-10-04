@@ -22,14 +22,14 @@ class TestMailActivityCancelTracking(HttpCase):
 
     def test_mail_activity_done(self):
         self.start_tour(
-            f"/web#id={self.partner.id}&model=res.partner",
+            f"/odoo/res.partner/{self.partner.id}",
             "mail_activity_cancel_tracking_done",
             login="test-user",
         )
 
     def test_mail_activity_cancel(self):
         self.start_tour(
-            f"/web#id={self.partner.id}&model=res.partner",
+            f"/odoo/res.partner/{self.partner.id}",
             "mail_activity_cancel_tracking_cancel",
             login="test-user",
         )
