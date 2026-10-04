@@ -46,6 +46,7 @@ class FetchmailCase(TransactionCase):
                 to="you@example.com",
                 cc="nobody@example.com",
                 subject="I'm a robot, hello",
+                date="Fri, 10 Aug 2012 14:16:26 +0000",
                 extra="",
                 msg_id="<fitter.happier.more.productive@example.com>",
             ),
