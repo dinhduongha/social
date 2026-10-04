@@ -48,24 +48,26 @@ class MailMessage(models.AbstractModel):
                     # unique (used by the thread_cache client model).
                     "id": self._get_create_message_id(domain),
                     # Author is not preserved above when creating the fake-record
-                    "author": {
-                        "id": author.id,
-                        "name": author.name,
-                        # 'partner' type will return odoo bot avatar
-                        "type": "partner",
-                    },
+                    "author_id": author.id,
                 }
             )
 
-            return data
+            return data, author
 
-        return None
+        return None, self.env["res.partner"]
 
     def _get_create_message_id(self, domain):
         # Odoo JS client needs an ID to manage its cache (thread_cache).
         # Return the negative version of the greatest message ID
         # of the current record so it's always unique.
-        return -self.search(domain, limit=1, order="id DESC").id
+        message_id = self.search(domain, limit=1, order="id DESC").id
+        if message_id:
+            return -message_id
+        # No stored message at all on the record (e.g. right after its
+        # creation): derive a negative id from the record itself, unique per
+        # (model, record) as the client store requires a truthy id.
+        record = self._messages_for_record(domain)
+        return -(self.env["ir.model"]._get_id(record._name) * 10**9 + record.id)
 
     @api.model
     def _messages_for_record(self, domain):
