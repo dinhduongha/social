@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, models
-from odoo.osv import expression
+from odoo.fields import Domain
 
 
 class ResPartner(models.Model):
@@ -15,21 +15,14 @@ class ResPartner(models.Model):
         """
         res = super()._get_mention_suggestions_domain(search)
         option = self.env.company.mail_mention_suggestion_option
-        if option == "users":
+        if option in ("users", "users_internal"):
             # Suggest partners that are related to any kind of users.
-            res = expression.AND(
-                [[("user_ids", "!=", False)], [("user_ids.active", "=", True)], res]
+            res &= Domain("user_ids", "!=", False) & Domain(
+                "user_ids.active", "=", True
             )
-        elif option == "users_internal":
-            # Suggest partners related to internal users.
-            res = expression.AND(
-                [
-                    [("user_ids", "!=", False)],
-                    [("user_ids.active", "=", True)],
-                    [("partner_share", "=", False)],
-                    res,
-                ]
-            )
+            if option == "users_internal":
+                # Suggest partners related to internal users only.
+                res &= Domain("partner_share", "=", False)
         return res
 
     def _search_mention_suggestions(self, domain, limit, extra_domain=None):
